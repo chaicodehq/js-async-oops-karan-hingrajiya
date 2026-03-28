@@ -75,12 +75,61 @@
  */
 export function createSamosaCart(ownerName, location) {
   // Your code here
+  function sellItem(itemName, quantity) {
+    const isKey = Object.hasOwn(this.menu, itemName);
+    if (isKey && quantity > 0) {
+      const totalPrice = this.menu[itemName] * quantity;
+      this.sales.push({ item: itemName, quantity, total: totalPrice });
+      return totalPrice;
+    }
+    return -1;
+  }
+
+  function getDailySales() {
+    return this.sales.reduce((acc, elem) => {
+      return acc + elem.total;
+    }, 0);
+  }
+
+  function getPopularItem() {
+    if (this.sales.length === 0) return null;
+    const arr = [...this.sales];
+    return arr.sort((a, b) => {
+      return b.quantity - a.quantity;
+    })[0].item;
+  }
+
+  function moveTo(newLocation) {
+    this.location = newLocation;
+    return `${this.owner} ka cart ab ${newLocation} pe hai!`;
+  }
+
+  function resetDay() {
+    this.sales = [];
+    return `${this.owner} ka naya din shuru!`;
+  }
+
+  return {
+    owner: ownerName,
+    location: location,
+    menu: { samosa: 15, jalebi: 20, kachori: 25 },
+    sales: [],
+    sellItem,
+    getDailySales,
+    getPopularItem,
+    moveTo,
+    resetDay,
+  };
 }
 
 export function demonstrateThisLoss(cart) {
   // Your code here
+  const { sellItem } = cart;
+  return sellItem;
 }
 
 export function fixWithBind(cart) {
   // Your code here
+  const { sellItem } = cart;
+  return sellItem.bind(cart);
 }

@@ -73,7 +73,89 @@
  */
 export function LassiStand(name, city) {
   // Your code here
+  this.name = name;
+  this.city = city;
+  this.menu = [];
+  this.orders = [];
+  this._nextOrderId = 1;
 }
+LassiStand.prototype.addFlavor = function (flavor, price) {
+  if (typeof price !== "number" || price <= 0) {
+    return -1;
+  }
+
+  let arr = this.menu;
+  // let exist = false;
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i].flavor === flavor) {
+      return -1;
+    }
+  }
+
+  this.menu.push({ flavor, price });
+
+  return this.menu.length;
+};
+
+LassiStand.prototype.takeOrder = function (customerName, flavor, quantity) {
+  if (typeof flavor !== "string" || quantity <= 0) return -1;
+  let arr = this.menu;
+  let exist = false;
+  let total = 0;
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i].flavor === flavor) {
+      exist = true;
+      total = arr[i].price * quantity;
+      break;
+    }
+  }
+
+  if (!exist) {
+    return -1;
+  }
+  // this._nextOrderId = this._nextOrderId++;
+  const order = {
+    id: this._nextOrderId++,
+    customer: customerName,
+    flavor,
+    quantity,
+    total,
+    status: "pending",
+  };
+
+  this.orders.push(order);
+  return order.id;
+};
+
+LassiStand.prototype.completeOrder = function (orderId) {
+  const order = this.orders.find((elem) => {
+    return elem.id === orderId;
+  });
+
+  if (order && order.status === "pending") {
+    order.status = "completed";
+    return true;
+  }
+  return false;
+};
+
+LassiStand.prototype.getRevenue = function () {
+  return this.orders.reduce((acc, elem) => {
+    if (elem.status === "completed") {
+      return acc + elem.total;
+    }
+    return acc;
+  }, 0);
+};
+
+LassiStand.prototype.getMenu = function () {
+  const resArr = [];
+  this.menu.forEach((elem) => {
+    resArr.push({ ...elem });
+  });
+
+  return resArr;
+};
 
 // Add prototype methods here:
 // LassiStand.prototype.addFlavor = function(flavor, price) { ... }
@@ -84,4 +166,5 @@ export function LassiStand(name, city) {
 
 export function isLassiStand(obj) {
   // Your code here
+  return obj instanceof LassiStand;
 }
